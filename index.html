@@ -16,16 +16,21 @@
       padding: 0;
       height: 100%;
       font-family: 'Fira Code', monospace;
-      background-color: #0f1117;
-      color: #00ff88;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #000;
       overflow: hidden;
     }
 
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
     .terminal {
-      background-color: #1e1e2f;
+      position: relative;
+      z-index: 1;
+      background-color: rgba(30, 30, 47, 0.9);
       padding: 2rem;
       border-radius: 16px;
       box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
@@ -35,7 +40,9 @@
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
-      overflow: hidden;
+      margin: auto;
+      top: 50%;
+      transform: translateY(-50%);
     }
 
     .line {
@@ -43,6 +50,7 @@
       font-size: 1rem;
       line-height: 1.6;
       min-height: 1.2em;
+      color: #00ff88;
     }
 
     .comment   { color: #888; }
@@ -53,6 +61,7 @@
     .cursor {
       display: inline-block;
       width: 0.6em;
+      color: #00ff88;
       animation: blink 1s infinite steps(1);
     }
 
@@ -65,7 +74,7 @@
       .terminal {
         padding: 1rem;
         border-radius: 12px;
-        height: auto;
+        height: 240px;
       }
 
       .line {
@@ -81,9 +90,11 @@
   </style>
 </head>
 <body>
+  <canvas id="matrix"></canvas>
+
   <div class="terminal">
     <div class="line" id="line1"></div>
-    <div class="line" id="line2"><span id="echoText"></span><span id="cursor" class="cursor">_</span></div>
+    <div class="line" id="line2"><span id="echoText"></span><span id="cursor" class="cursor">|</span></div>
     <div class="line" id="line3"></div>
     <div class="line" id="line4"></div>
   </div>
@@ -120,18 +131,17 @@
     function typeLine({ id, html, delay, speed, isEchoLine = false }) {
       const container = isEchoLine ? document.getElementById('echoText') : document.getElementById(id);
       const cursor = document.getElementById('cursor');
-      let text = html;
       let i = 0;
       let insideTag = false;
       let result = "";
 
       function typeChar() {
-        if (i >= text.length) {
+        if (i >= html.length) {
           if (isEchoLine && cursor) cursor.remove();
           return;
         }
 
-        const char = text[i];
+        const char = html[i];
         result += char;
         container.innerHTML = result;
         i++;
@@ -146,6 +156,44 @@
     }
 
     lines.forEach(typeLine);
+  </script>
+
+  <script>
+    const canvas = document.getElementById('matrix');
+    const ctx = canvas.getContext('2d');
+
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
+
+    const letters = "01";
+    const fontSize = 14;
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
+
+    function draw() {
+      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = "#00ff88";
+      ctx.font = fontSize + "px monospace";
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+
+        drops[i]++;
+      }
+    }
+
+    setInterval(draw, 33);
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
   </script>
 </body>
 </html>
