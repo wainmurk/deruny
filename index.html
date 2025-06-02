@@ -88,6 +88,14 @@
         font-size: 0.8rem;
       }
     }
+a.plain-link {
+  color: inherit;
+  text-decoration: none;
+  font-family: inherit;
+}
+a.plain-link:hover {
+  text-decoration: underline dotted;
+}
   </style>
 </head>
 <body>
@@ -123,7 +131,7 @@
       },
       {
         id: 'line4',
-        html: `<span class="contact">Зв’язатися з нами: <strong>Discord →</strong> <a href="https://discord.gg/eTp2HCKcgQ" target="_blank">Тиць</a></span>`,
+        html: `<span class="contact">Зв’язатися з нами: <strong>Discord →</strong> <a class="plain-link" href="https://discord.gg/eTp2HCKcgQ" target="_blank">Тиць</a></span>`,
         delay: 5000,
         speed: 40
       }
