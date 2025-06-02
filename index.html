@@ -36,7 +36,7 @@
       box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
       width: 95%;
       max-width: 800px;
-      height: auto;
+      height: 280px;
       display: flex;
       flex-direction: column;
       justify-content: flex-start;
@@ -61,8 +61,8 @@
     .cursor {
       display: inline-block;
       width: 0.6em;
-      animation: blink 1s infinite steps(1);
       color: #00ff88;
+      animation: blink 1s infinite steps(1);
     }
 
     @keyframes blink {
@@ -74,6 +74,7 @@
       .terminal {
         padding: 1rem;
         border-radius: 12px;
+        height: 240px;
       }
 
       .line {
@@ -92,60 +93,95 @@
   <canvas id="matrix"></canvas>
 
   <div class="terminal">
-    <div class="line"><span class="prompt">user@project:</span><span class="directory">~</span>$ <span id="line1"></span><span class="cursor" id="cursor1">|</span></div>
-    <div class="line"><span class="prompt">user@project:</span><span class="directory">~</span>$ <span id="line2"></span><span class="cursor" id="cursor2">|</span></div>
-    <div class="line"><span class="prompt">user@project:</span><span class="directory">~</span>$ <span id="line3"></span><span class="cursor" id="cursor3">|</span></div>
-    <div class="line"><span class="prompt">user@project:</span><span class="directory">~</span>$ <span id="line4"></span><span class="cursor" id="cursor4">|</span></div>
+    <div class="line" id="line1"></div>
+    <div class="line" id="line2"><span id="echoText"></span><span id="cursor" class="cursor">|</span></div>
+    <div class="line" id="line3"></div>
+    <div class="line" id="line4"></div>
   </div>
 
   <script>
     const lines = [
-      { id: 'line1', text: '# Ласкаво просимо на наш сайт', delay: 0, speed: 30 },
-      { id: 'line2', text: 'echo "Сайт у розробці..."', delay: 1000, speed: 40 },
-      { id: 'line3', text: 'Ми активно працюємо над запуском. Дякуємо за терпіння.', delay: 2500, speed: 30 },
-      { id: 'line4', text: 'Зв’язатися з нами: Discord → @wainmurk', delay: 4000, speed: 30 }
+      {
+        id: 'line1',
+        html: '<span class="comment"># Ласкаво просимо на наш сайт</span>',
+        delay: 500,
+        speed: 40
+      },
+      {
+        id: 'line2',
+        html: '<span class="prompt">user@project:</span><span class="directory">~</span>$ echo "Сайт у розробці..."',
+        delay: 1500,
+        speed: 25,
+        isEchoLine: true
+      },
+      {
+        id: 'line3',
+        html: '<span class="prompt">Ми активно працюємо над запуском. Дякуємо за терпіння.</span>',
+        delay: 3500,
+        speed: 30
+      },
+      {
+        id: 'line4',
+        html: '<span class="contact">Зв’язатися з нами: <strong>Discord → @wainmurk</strong></span>',
+        delay: 5000,
+        speed: 40
+      }
     ];
 
-    lines.forEach(({ id, text, delay, speed }, index) => {
-      const el = document.getElementById(id);
-      const cursor = document.getElementById('cursor' + (index + 1));
+    function typeLine({ id, html, delay, speed, isEchoLine = false }) {
+      const container = isEchoLine ? document.getElementById('echoText') : document.getElementById(id);
+      const cursor = document.getElementById('cursor');
       let i = 0;
-      setTimeout(function typeChar() {
-        if (i <= text.length) {
-          el.textContent = text.substring(0, i);
-          i++;
-          setTimeout(typeChar, speed);
-        } else if (cursor) {
-          // оставить мигающий курсор
+      let insideTag = false;
+      let result = "";
+
+      function typeChar() {
+        if (i >= html.length) {
+          if (isEchoLine && cursor) cursor.remove();
+          return;
         }
-      }, delay);
-    });
+
+        const char = html[i];
+        result += char;
+        container.innerHTML = result;
+        i++;
+
+        if (char === '<') insideTag = true;
+        if (char === '>') insideTag = false;
+
+        setTimeout(typeChar, insideTag ? 0 : speed);
+      }
+
+      setTimeout(typeChar, delay);
+    }
+
+    lines.forEach(typeLine);
   </script>
 
   <script>
     const canvas = document.getElementById('matrix');
     const ctx = canvas.getContext('2d');
 
-    let width = canvas.width = window.innerWidth;
-    let height = canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight;
+    canvas.width = window.innerWidth;
 
     const letters = "01";
     const fontSize = 14;
-    const columns = Math.floor(width / fontSize);
-    const drops = new Array(columns).fill(1);
+    const columns = canvas.width / fontSize;
+    const drops = Array(Math.floor(columns)).fill(1);
 
     function draw() {
       ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, width, height);
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       ctx.fillStyle = "#00ff88";
       ctx.font = fontSize + "px monospace";
 
       for (let i = 0; i < drops.length; i++) {
-        const char = letters[Math.floor(Math.random() * letters.length)];
-        ctx.fillText(char, i * fontSize, drops[i] * fontSize);
+        const text = letters[Math.floor(Math.random() * letters.length)];
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-        if (drops[i] * fontSize > height && Math.random() > 0.975) {
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
           drops[i] = 0;
         }
 
@@ -154,10 +190,9 @@
     }
 
     setInterval(draw, 33);
-
     window.addEventListener('resize', () => {
-      width = canvas.width = window.innerWidth;
-      height = canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
   </script>
 </body>
