@@ -5,33 +5,45 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Сайт у розробці</title>
   <style>
-    body {
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Fira Code', monospace;
       background-color: #0f1117;
       color: #00ff88;
-      font-family: "Fira Code", monospace;
       display: flex;
       align-items: center;
       justify-content: center;
-      height: 100vh;
-      margin: 0;
       overflow: hidden;
     }
 
     .terminal {
-      background: #1e1e2f;
+      background-color: #1e1e2f;
       padding: 2rem;
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0,255,136,0.2);
-      width: 90%;
-      max-width: 600px;
+      border-radius: 16px;
+      box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
+      width: 95%;
+      max-width: 800px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .line {
-      white-space: pre;
+      white-space: pre-wrap;
       overflow: hidden;
       border-right: 2px solid #00ff88;
-      width: 100%;
-      animation: typing 3.5s steps(40, end), blink 0.75s step-end infinite;
+      animation: typing 4s steps(60, end) 1, blink 1s step-end infinite;
+      font-size: 1rem;
+      line-height: 1.6;
     }
 
     @keyframes typing {
@@ -55,32 +67,51 @@
       color: #ffcb6b;
     }
 
-    .cursor {
-      display: inline-block;
-      background: #00ff88;
-      width: 10px;
-      height: 1em;
-      vertical-align: bottom;
-      animation: blink 1s steps(2, start) infinite;
-    }
-
-    a {
+    .contact {
+      margin-top: 1rem;
+      font-size: 1rem;
       color: #00d0ff;
-      text-decoration: none;
+      animation: fadeIn 3s ease-in forwards;
+      opacity: 0;
     }
 
-    a:hover {
-      text-decoration: underline;
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
+    @media (max-width: 600px) {
+      .terminal {
+        padding: 1rem;
+        border-radius: 12px;
+      }
+
+      .line, .contact {
+        font-size: 0.9rem;
+      }
+    }
+
+    @media (max-width: 360px) {
+      .line, .contact {
+        font-size: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
   <div class="terminal">
-    <div class="line"><span class="comment"># Ласкаво просимо на наш сайт</span></div>
-    <div class="line"><span class="prompt">user@project:</span><span class="directory">~</span>$ echo "Сайт у розробці..."</div>
-    <div class="line"><span class="prompt">Незабаром тут з’явиться щось круте.</span></div>
-    <div class="line"><span class="prompt">Слідкуйте за оновленнями 👉</span> <a href="#">telegram.me/yourproject</a></div>
+    <div class="line">
+      <span class="comment"># Ласкаво просимо на наш сайт</span>
+    </div>
+    <div class="line">
+      <span class="prompt">user@project:</span><span class="directory">~</span>$ echo "Сайт у розробці..."
+    </div>
+    <div class="line">
+      <span class="prompt">Ми активно працюємо над запуском. Дякуємо за терпіння.</span>
+    </div>
+    <div class="contact">
+      Зв’язатися з нами: <strong>Discord → @wainmurk</strong>
+    </div>
   </div>
 </body>
 </html>
