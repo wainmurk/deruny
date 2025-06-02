@@ -31,72 +31,50 @@
       box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
       width: 95%;
       max-width: 800px;
-      max-height: 90vh;
+      height: 280px;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 1rem;
+      justify-content: flex-start;
+      overflow: hidden;
     }
 
     .line {
       white-space: pre-wrap;
       font-size: 1rem;
       line-height: 1.6;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInUp 1s ease-out forwards;
+      min-height: 1.2em;
     }
 
-    .line:nth-child(1) { animation-delay: 0.2s; }
-    .line:nth-child(2) { animation-delay: 0.6s; }
-    .line:nth-child(3) { animation-delay: 1s; }
+    .comment   { color: #888; }
+    .prompt    { color: #00ff88; }
+    .directory { color: #ffcb6b; }
+    .contact   { color: #00d0ff; }
 
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(10px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+    .cursor {
+      display: inline-block;
+      width: 0.6em;
+      animation: blink 1s infinite steps(1);
     }
 
-    .comment {
-      color: #888;
-    }
-
-    .prompt {
-      color: #00ff88;
-    }
-
-    .directory {
-      color: #ffcb6b;
-    }
-
-    .contact {
-      margin-top: 1rem;
-      font-size: 1rem;
-      color: #00d0ff;
-      opacity: 0;
-      transform: translateY(10px);
-      animation: fadeInUp 1s ease-out forwards;
-      animation-delay: 1.4s;
+    @keyframes blink {
+      0%, 50% { opacity: 1; }
+      50.01%, 100% { opacity: 0; }
     }
 
     @media (max-width: 600px) {
       .terminal {
         padding: 1rem;
         border-radius: 12px;
+        height: auto;
       }
 
-      .line, .contact {
+      .line {
         font-size: 0.9rem;
       }
     }
 
     @media (max-width: 360px) {
-      .line, .contact {
+      .line {
         font-size: 0.8rem;
       }
     }
@@ -104,18 +82,70 @@
 </head>
 <body>
   <div class="terminal">
-    <div class="line">
-      <span class="comment"># Ласкаво просимо на наш сайт</span>
-    </div>
-    <div class="line">
-      <span class="prompt">user@project:</span><span class="directory">~</span>$ echo "Сайт у розробці..."
-    </div>
-    <div class="line">
-      <span class="prompt">Ми активно працюємо над запуском. Дякуємо за терпіння.</span>
-    </div>
-    <div class="contact">
-      Зв’язатися з нами: <strong>Discord → @wainmurk</strong>
-    </div>
+    <div class="line" id="line1"></div>
+    <div class="line" id="line2"><span id="echoText"></span><span id="cursor" class="cursor">_</span></div>
+    <div class="line" id="line3"></div>
+    <div class="line" id="line4"></div>
   </div>
+
+  <script>
+    const lines = [
+      {
+        id: 'line1',
+        html: '<span class="comment"># Ласкаво просимо на наш сайт</span>',
+        delay: 500,
+        speed: 40
+      },
+      {
+        id: 'line2',
+        html: '<span class="prompt">user@project:</span><span class="directory">~</span>$ echo "Сайт у розробці..."',
+        delay: 1500,
+        speed: 25,
+        isEchoLine: true
+      },
+      {
+        id: 'line3',
+        html: '<span class="prompt">Ми активно працюємо над запуском. Дякуємо за терпіння.</span>',
+        delay: 3500,
+        speed: 30
+      },
+      {
+        id: 'line4',
+        html: '<span class="contact">Зв’язатися з нами: <strong>Discord → @wainmurk</strong></span>',
+        delay: 5000,
+        speed: 40
+      }
+    ];
+
+    function typeLine({ id, html, delay, speed, isEchoLine = false }) {
+      const container = isEchoLine ? document.getElementById('echoText') : document.getElementById(id);
+      const cursor = document.getElementById('cursor');
+      let text = html;
+      let i = 0;
+      let insideTag = false;
+      let result = "";
+
+      function typeChar() {
+        if (i >= text.length) {
+          if (isEchoLine && cursor) cursor.remove();
+          return;
+        }
+
+        const char = text[i];
+        result += char;
+        container.innerHTML = result;
+        i++;
+
+        if (char === '<') insideTag = true;
+        if (char === '>') insideTag = false;
+
+        setTimeout(typeChar, insideTag ? 0 : speed);
+      }
+
+      setTimeout(typeChar, delay);
+    }
+
+    lines.forEach(typeLine);
+  </script>
 </body>
 </html>
