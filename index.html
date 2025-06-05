@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="uk">
 <head>
+  <link rel="icon" type="image/png" href="/favicon.png">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Сайт у розробці</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
 
@@ -28,6 +28,36 @@
       z-index: 0;
     }
 
+    .button-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .action-button {
+      background-color: rgba(0, 255, 136, 0.15);
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      font-family: 'Fira Code', monospace;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .action-button:hover {
+      background-color: rgba(0, 255, 136, 0.3);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
     .terminal {
       position: relative;
       z-index: 1;
@@ -44,37 +74,6 @@
       margin: auto;
       top: 50%;
       transform: translateY(-50%);
-    }
-
-    .button-container {
-      position: relative;
-      z-index: 1;
-      margin: 20px auto 0;
-      max-width: 800px;
-      display: flex;
-      justify-content: center;
-      gap: 1rem;
-      padding: 1rem;
-      background-color: rgba(20, 20, 30, 0.8);
-      border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 255, 136, 0.1);
-    }
-
-    .button-container button {
-      font-family: 'Fira Code', monospace;
-      background-color: #00ff88;
-      border: none;
-      padding: 0.6rem 1rem;
-      border-radius: 8px;
-      cursor: pointer;
-      color: #000;
-      font-weight: bold;
-      transition: background-color 0.3s ease, transform 0.2s;
-    }
-
-    .button-container button:hover {
-      background-color: #00d877;
-      transform: scale(1.05);
     }
 
     .line {
@@ -112,10 +111,19 @@
       .line {
         font-size: 0.9rem;
       }
+
+      .action-button {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+      }
     }
 
     @media (max-width: 360px) {
       .line {
+        font-size: 0.8rem;
+      }
+
+      .action-button {
         font-size: 0.8rem;
       }
     }
@@ -125,59 +133,26 @@
       text-decoration: none;
       font-family: inherit;
     }
-
     a.plain-link:hover {
       text-decoration: underline dotted;
-    }
-
-    /* Animation Effects */
-    .effect {
-      position: fixed;
-      z-index: 10;
-      pointer-events: none;
-    }
-
-    .explosion {
-      width: 200px;
-      height: 200px;
-      background: radial-gradient(circle, #ff4500, #000);
-      border-radius: 50%;
-      animation: explode 1s ease-out forwards;
-    }
-
-    @keyframes explode {
-      0% { transform: scale(0.5); opacity: 1; }
-      100% { transform: scale(5); opacity: 0; }
-    }
-
-    .bubbles {
-      width: 100px;
-      height: 100px;
-      background: radial-gradient(circle, #00ffff, transparent 70%);
-      border-radius: 50%;
-      animation: bubble 1.5s ease-out forwards;
-    }
-
-    @keyframes bubble {
-      0% { transform: scale(0.3) translateY(0); opacity: 1; }
-      100% { transform: scale(1.5) translateY(-100px); opacity: 0; }
     }
   </style>
 </head>
 <body>
   <canvas id="matrix"></canvas>
 
+  <!-- Новый блок с кнопками -->
+  <div class="button-bar">
+    <a href="https://panel.deruny.com.ua" class="action-button">Адмін панель</a>
+    <button class="action-button">Пуск ядерної ракети на Москву</button>
+    <button class="action-button">Замовити пиво</button>
+  </div>
+
   <div class="terminal">
     <div class="line" id="line1"></div>
     <div class="line" id="line2"><span id="echoText"></span><span id="cursor" class="cursor">|</span></div>
     <div class="line" id="line3"></div>
     <div class="line" id="line4"></div>
-  </div>
-
-  <div class="button-container">
-    <button onclick="window.location.href='https://panel.deruny.com.ua'">Адмін панель</button>
-    <button onclick="triggerEffect('explosion')">Пуск ядерної ракети на Москву</button>
-    <button onclick="triggerEffect('bubbles')">Замовити пиво</button>
   </div>
 
   <script>
@@ -237,20 +212,6 @@
     }
 
     lines.forEach(typeLine);
-
-    function triggerEffect(type) {
-      const el = document.createElement('div');
-      el.classList.add('effect');
-      el.classList.add(type);
-
-      el.style.top = '50%';
-      el.style.left = '50%';
-      el.style.transform = 'translate(-50%, -50%)';
-
-      document.body.appendChild(el);
-
-      setTimeout(() => el.remove(), 1500);
-    }
   </script>
 
   <script>
