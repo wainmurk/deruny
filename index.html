@@ -28,6 +28,36 @@
       z-index: 0;
     }
 
+    .button-bar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .action-button {
+      background-color: rgba(0, 255, 136, 0.15);
+      border: 1px solid #00ff88;
+      color: #00ff88;
+      font-family: 'Fira Code', monospace;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease-in-out;
+      text-decoration: none;
+      text-align: center;
+    }
+
+    .action-button:hover {
+      background-color: rgba(0, 255, 136, 0.3);
+      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+    }
+
     .terminal {
       position: relative;
       z-index: 1;
@@ -81,25 +111,42 @@
       .line {
         font-size: 0.9rem;
       }
+
+      .action-button {
+        font-size: 0.9rem;
+        padding: 0.5rem 1rem;
+      }
     }
 
     @media (max-width: 360px) {
       .line {
         font-size: 0.8rem;
       }
+
+      .action-button {
+        font-size: 0.8rem;
+      }
     }
-a.plain-link {
-  color: #00ff88;
-  text-decoration: none;
-  font-family: inherit;
-}
-a.plain-link:hover {
-  text-decoration: underline dotted;
-}
+
+    a.plain-link {
+      color: #00ff88;
+      text-decoration: none;
+      font-family: inherit;
+    }
+    a.plain-link:hover {
+      text-decoration: underline dotted;
+    }
   </style>
 </head>
 <body>
   <canvas id="matrix"></canvas>
+
+  <!-- Новый блок с кнопками -->
+  <div class="button-bar">
+    <a href="https://panel.deruny.com.ua" class="action-button">Адмін панель</a>
+    <button class="action-button">Пуск ядерної ракети на Москву</button>
+    <button class="action-button">Замовити пиво</button>
+  </div>
 
   <div class="terminal">
     <div class="line" id="line1"></div>
