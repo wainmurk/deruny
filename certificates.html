@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Сертифікати</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
+    :root{--accent:#00ff88}
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;height:100%;font-family:'Fira Code',monospace;background:#0b0d12;color:#e5ffee}
+    .wrap{max-width:1100px;margin:0 auto;padding:24px}
+    .card{background:#141826;border:1px solid #1f2740;border-radius:14px;box-shadow:0 0 20px rgba(0,255,136,.08);padding:20px}
+    .row{display:flex;gap:16px;flex-wrap:wrap}
+    .btn{background:rgba(0,255,136,.12);border:1px solid var(--accent);color:var(--accent);padding:.55rem 1rem;border-radius:10px;cursor:pointer;text-decoration:none;transition:.15s;font-size:.95rem}
+    .btn:hover{background:rgba(0,255,136,.25);box-shadow:0 0 10px rgba(0,255,136,.4)}
+    .muted{opacity:.7}
+    input[type="password"]{width:100%;padding:.6rem .8rem;border-radius:10px;border:1px solid #2a3558;background:#0e1322;color:#e5ffee}
+    .grid{display:grid;grid-template-columns:280px 1fr;gap:18px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+    .list{max-height:60vh;overflow:auto;border:1px dashed #263054;border-radius:10px;padding:10px}
+    .item{display:flex;justify-content:space-between;gap:10px;padding:8px;border-bottom:1px dashed #263054}
+    .item:last-child{border-bottom:none}
+    .pdf-view{height:70vh;border:1px solid #263054;border-radius:10px;overflow:hidden;background:#0e1322;position:relative}
+    .pdf-view iframe{width:100%;height:100%;border:0;background:#0e1322}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>🔐 Сертифікати</h1>
+    <p class="muted">Парольний доступ на стороні клієнта (SHA-256). Файли зберігаються у репозиторії в папці <code>/certs</code>.</p>
+
+    <!-- Экран пароля -->
+    <div id="gate" class="card">
+      <h2 style="margin-top:0">Вхід</h2>
+      <p class="muted">Введіть пароль для перегляду списку PDF.</p>
+      <div class="row">
+        <div style="flex:1;min-width:260px">
+          <label class="muted">Пароль</label>
+          <input id="pwd" type="password" placeholder="••••••••">
+        </div>
+        <div class="row" style="align-items:flex-end">
+          <button id="enterBtn" class="btn">Увійти</button>
+          <a href="index.html" class="btn">← На головну</a>
+        </div>
+      </div>
+      <p id="msg" class="muted" style="margin-top:10px;"></p>
+    </div>
+
+    <!-- Основной интерфейс -->
+    <div id="app" class="card" style="display:none">
+      <div class="row" style="justify-content:space-between;align-items:center">
+        <h2 style="margin:0">Ваші PDF</h2>
+        <div class="row">
+          <button id="prevBtn" class="btn">⟵ Попередній</button>
+          <button id="nextBtn" class="btn">Наступний ⟶</button>
+          <button id="lockBtn" class="btn" style="border-color:#ff7b7b;color:#ffbcbc;background:rgba(255,90,90,.1)">Вийти</button>
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top:14px">
+        <div>
+          <div class="list" id="fileList"></div>
+          <p class="muted" style="margin-top:8px">📄 Файли беруться з <code>/certs/manifest.json</code>. Щоб додати — покладіть PDF у <code>/certs</code> і оновіть маніфест.</p>
+        </div>
+        <div class="pdf-view">
+          <iframe id="viewer" title="PDF Viewer" referrerpolicy="no-referrer"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+// ==== НАСТРОЙКА ПАРОЛЯ =======================================================
+// Установите ваш пароль: посчитайте SHA-256 от строки пароля и присвойте сюда.
+// Быстро получить хеш можно на этой же странице в консоли:
+//   (async s=>{const d=new TextEncoder().encode(s);const h=await crypto.subtle.digest('SHA-256',d);
+//    console.log([...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''));})('ВАШ_ПАРОЛЬ')
+const PASSWORD_SHA256_HEX = '8f0d807…put_your_hash_here…c5'; // ЗАМЕНІТЬ на ваш хеш
+
+// ==== ЛОГИКА СТРАНИЦЫ =======================================================
+const gate = document.getElementById('gate');
+const app  = document.getElementById('app');
+const msg  = document.getElementById('msg');
+const pwd  = document.getElementById('pwd');
+const enterBtn = document.getElementById('enterBtn');
+const viewer = document.getElementById('viewer');
+const fileListEl = document.getElementById('fileList');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const lockBtn = document.getElementById('lockBtn');
+
+let unlocked = false;
+let files = [];
+let idx = 0;
+
+function toHex(buf){ return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join(''); }
+
+async function sha256Hex(text){
+  const buf = new TextEncoder().encode(text);
+  const digest = await crypto.subtle.digest('SHA-256', buf);
+  return toHex(digest);
+}
+
+function renderList(){
+  fileListEl.innerHTML = '';
+  if(files.length === 0){
+    fileListEl.innerHTML = '<div class="muted" style="padding:16px">Поки що порожньо.</div>';
+    viewer.src = 'about:blank';
+    return;
+  }
+  files.forEach((f,i)=>{
+    const row = document.createElement('div');
+    row.className = 'item';
+    row.innerHTML = `
+      <div><strong>${escapeHtml(f.title || f.file)}</strong>
+      <div class="muted" style="font-size:.85rem">${escapeHtml(f.file)}</div></div>
+      <div class="row"><button class="btn" data-open="${i}">Відкрити</button></div>`;
+    row.querySelector('button').onclick = ()=>openAt(i);
+    fileListEl.appendChild(row);
+  });
+}
+
+function escapeHtml(s){ return s.replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function openAt(i){
+  idx = i;
+  // Скрываем тулбар ридера (не защита, а только убирает кнопки UI)
+  viewer.src = `/certs/${encodeURIComponent(files[i].file)}#toolbar=0&navpanes=0&scrollbar=0`;
+}
+
+prevBtn.onclick = ()=>{ if(files.length){ openAt((idx-1+files.length)%files.length); } };
+nextBtn.onclick = ()=>{ if(files.length){ openAt((idx+1)%files.length); } };
+
+lockBtn.onclick = ()=>{
+  unlocked = false;
+  files = [];
+  idx = 0;
+  viewer.src = 'about:blank';
+  app.style.display = 'none';
+  gate.style.display = 'block';
+  pwd.value = '';
+  msg.textContent = 'Сесію закрито.';
+};
+
+enterBtn.onclick = async ()=>{
+  const hash = await sha256Hex(pwd.value || '');
+  if(hash !== PASSWORD_SHA256_HEX){
+    msg.textContent = 'Невірний пароль.';
+    return;
+  }
+  msg.textContent = 'Пароль вірний. Завантажуємо список…';
+  unlocked = true;
+  try{
+    const r = await fetch('/certs/manifest.json', {cache:'no-store'});
+    if(!r.ok) throw new Error('manifest fetch failed');
+    const data = await r.json();
+    files = (data.files||[]).filter(f=>typeof f.file === 'string');
+    gate.style.display = 'none';
+    app.style.display = 'block';
+    renderList();
+    if(files.length) openAt(0);
+  }catch(e){
+    console.error(e);
+    msg.textContent = 'Не вдалося завантажити manifest.json';
+  }
+};
+
+// Разрешаем Enter
+pwd.addEventListener('keydown', e=>{ if(e.key==='Enter') enterBtn.click(); });
+
+</script>
+</body>
+</html>
