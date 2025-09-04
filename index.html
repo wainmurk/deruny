@@ -7,145 +7,29 @@
   <title>Сайт у розробці</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
-
-    * {
-      box-sizing: border-box;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      font-family: 'Fira Code', monospace;
-      background: #000;
-      overflow: hidden;
-    }
-
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      z-index: 0;
-    }
-
-    .button-bar {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      justify-content: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      padding: 1.5rem;
-      margin-top: 2rem;
-    }
-
-    .action-button {
-      background-color: rgba(0, 255, 136, 0.15);
-      border: 1px solid #00ff88;
-      color: #00ff88;
-      font-family: 'Fira Code', monospace;
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s ease-in-out;
-      text-decoration: none;
-      text-align: center;
-    }
-
-    .action-button:hover {
-      background-color: rgba(0, 255, 136, 0.3);
-      box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
-    }
-
-    .terminal {
-      position: relative;
-      z-index: 1;
-      background-color: rgba(30, 30, 47, 0.9);
-      padding: 2rem;
-      border-radius: 16px;
-      box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
-      width: 95%;
-      max-width: 800px;
-      height: 280px;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-      margin: auto;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-
-    .line {
-      white-space: pre-wrap;
-      font-size: 1rem;
-      line-height: 1.6;
-      min-height: 1.2em;
-      color: #00ff88;
-    }
-
-    .comment   { color: #888; }
-    .prompt    { color: #00ff88; }
-    .directory { color: #ffcb6b; }
-    .contact   { color: #00d0ff; }
-
-    .cursor {
-      display: inline-block;
-      width: 0.6em;
-      color: #00ff88;
-      animation: blink 1s infinite steps(1);
-    }
-
-    @keyframes blink {
-      0%, 50% { opacity: 1; }
-      50.01%, 100% { opacity: 0; }
-    }
-
-    @media (max-width: 600px) {
-      .terminal {
-        padding: 1rem;
-        border-radius: 12px;
-        height: 240px;
-      }
-
-      .line {
-        font-size: 0.9rem;
-      }
-
-      .action-button {
-        font-size: 0.9rem;
-        padding: 0.5rem 1rem;
-      }
-    }
-
-    @media (max-width: 360px) {
-      .line {
-        font-size: 0.8rem;
-      }
-
-      .action-button {
-        font-size: 0.8rem;
-      }
-    }
-
-    a.plain-link {
-      color: #00ff88;
-      text-decoration: none;
-      font-family: inherit;
-    }
-    a.plain-link:hover {
-      text-decoration: underline dotted;
-    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;height:100%;font-family:'Fira Code',monospace;background:#000;overflow:hidden}
+    canvas{position:fixed;top:0;left:0;z-index:0}
+    .button-bar{position:relative;z-index:2;display:flex;justify-content:center;flex-wrap:wrap;gap:1rem;padding:1.5rem;margin-top:2rem}
+    .action-button{background-color:rgba(0,255,136,.15);border:1px solid #00ff88;color:#00ff88;padding:.6rem 1.2rem;border-radius:8px;font-size:1rem;cursor:pointer;transition:.2s;text-decoration:none;text-align:center}
+    .action-button:hover{background-color:rgba(0,255,136,.3);box-shadow:0 0 10px rgba(0,255,136,.5)}
+    .terminal{position:relative;z-index:1;background-color:rgba(30,30,47,.9);padding:2rem;border-radius:16px;box-shadow:0 0 30px rgba(0,255,136,.25);width:95%;max-width:800px;height:280px;display:flex;flex-direction:column;justify-content:flex-start;margin:auto;top:50%;transform:translateY(-50%)}
+    .line{white-space:pre-wrap;font-size:1rem;line-height:1.6;min-height:1.2em;color:#00ff88}
+    .comment{color:#888}.prompt{color:#00ff88}.directory{color:#ffcb6b}.contact{color:#00d0ff}
+    .cursor{display:inline-block;width:.6em;color:#00ff88;animation:blink 1s infinite steps(1)}
+    @keyframes blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+    @media (max-width:600px){.terminal{padding:1rem;border-radius:12px;height:240px}.line{font-size:.9rem}.action-button{font-size:.9rem;padding:.5rem 1rem}}
+    @media (max-width:360px){.line{font-size:.8rem}.action-button{font-size:.8rem}}
+    a.plain-link{color:#00ff88;text-decoration:none;font-family:inherit}
+    a.plain-link:hover{text-decoration:underline dotted}
   </style>
 </head>
 <body>
   <canvas id="matrix"></canvas>
 
-  <!-- Новый блок с кнопками -->
   <div class="button-bar">
     <a href="https://panel.deruny.com.ua" class="action-button">Адмін панель</a>
-    <button class="action-button">Пуск ядерної ракети на Москву</button>
-    <button class="action-button">Замовити пиво</button>
+    <a href="certificates.html" class="action-button">Сертифікати</a>
   </div>
 
   <div class="terminal">
@@ -156,100 +40,39 @@
   </div>
 
   <script>
-    const lines = [
-      {
-        id: 'line1',
-        html: '<span class="comment"># Ласкаво просимо на наш сайт</span>',
-        delay: 500,
-        speed: 40
-      },
-      {
-        id: 'line2',
-        html: '<span class="prompt">user@project:</span><span class="directory">~</span>$ echo "Сайт у розробці..."',
-        delay: 1500,
-        speed: 25,
-        isEchoLine: true
-      },
-      {
-        id: 'line3',
-        html: '<span class="prompt">Ми активно працюємо над запуском. Дякуємо за терпіння.</span>',
-        delay: 3500,
-        speed: 30
-      },
-      {
-        id: 'line4',
-        html: `<span class="contact">Зв’язатися з нами: <strong>Discord →</strong> <a class="plain-link" href="https://discord.gg/eTp2HCKcgQ" target="_blank">[Тиць]</a></span>`,
-        delay: 5000,
-        speed: 40
-      }
+    const lines=[
+      {id:'line1',html:'<span class="comment"># Ласкаво просимо на наш сайт</span>',delay:500,speed:40},
+      {id:'line2',html:'<span class="prompt">user@project:</span><span class="directory">~</span>$ echo "Сайт у розробці..."',delay:1500,speed:25,isEchoLine:true},
+      {id:'line3',html:'<span class="prompt">Ми активно працюємо над запуском. Дякуємо за терпіння.</span>',delay:3500,speed:30},
+      {id:'line4',html:`<span class="contact">Зв’язатися з нами: <strong>Discord →</strong> <a class="plain-link" href="https://discord.gg/eTp2HCKcgQ" target="_blank">[Тиць]</a></span>`,delay:5000,speed:40}
     ];
-
-    function typeLine({ id, html, delay, speed, isEchoLine = false }) {
-      const container = isEchoLine ? document.getElementById('echoText') : document.getElementById(id);
-      const cursor = document.getElementById('cursor');
-      let i = 0;
-      let insideTag = false;
-      let result = "";
-
-      function typeChar() {
-        if (i >= html.length) {
-          if (isEchoLine && cursor) cursor.remove();
-          return;
-        }
-
-        const char = html[i];
-        result += char;
-        container.innerHTML = result;
-        i++;
-
-        if (char === '<') insideTag = true;
-        if (char === '>') insideTag = false;
-
-        setTimeout(typeChar, insideTag ? 0 : speed);
-      }
-
-      setTimeout(typeChar, delay);
-    }
-
-    lines.forEach(typeLine);
+    function typeLine({id,html,delay,speed,isEchoLine=false}) {
+      const container=isEchoLine?document.getElementById('echoText'):document.getElementById(id);
+      const cursor=document.getElementById('cursor');let i=0,insideTag=false,result="";
+      function typeChar(){ if(i>=html.length){ if(isEchoLine&&cursor)cursor.remove(); return;}
+        const ch=html[i]; result+=ch; container.innerHTML=result; i++;
+        if(ch==='<' )insideTag=true; if(ch==='>')insideTag=false;
+        setTimeout(typeChar,insideTag?0:speed);
+      } setTimeout(typeChar,delay);
+    } lines.forEach(typeLine);
   </script>
 
   <script>
-    const canvas = document.getElementById('matrix');
-    const ctx = canvas.getContext('2d');
-
-    canvas.height = window.innerHeight;
-    canvas.width = window.innerWidth;
-
-    const letters = "01";
-    const fontSize = 14;
-    const columns = canvas.width / fontSize;
-    const drops = Array(Math.floor(columns)).fill(1);
-
-    function draw() {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-      ctx.fillStyle = "#00ff88";
-      ctx.font = fontSize + "px monospace";
-
-      for (let i = 0; i < drops.length; i++) {
-        const text = letters[Math.floor(Math.random() * letters.length)];
-        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
-          drops[i] = 0;
-        }
-
+    const canvas=document.getElementById('matrix');const ctx=canvas.getContext('2d');
+    function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+    resize(); window.addEventListener('resize',resize);
+    const letters="01"; const fontSize=14; let columns=Math.floor(canvas.width/fontSize);
+    let drops=Array(columns).fill(1);
+    function draw(){
+      ctx.fillStyle="rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle="#00ff88"; ctx.font=fontSize+"px monospace";
+      for(let i=0;i<drops.length;i++){
+        const t=letters[Math.floor(Math.random()*letters.length)];
+        ctx.fillText(t,i*fontSize,drops[i]*fontSize);
+        if(drops[i]*fontSize>canvas.height && Math.random()>0.975) drops[i]=0;
         drops[i]++;
       }
-    }
-
-    setInterval(draw, 33);
-    window.addEventListener('resize', () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-    });
+    } setInterval(draw,33);
   </script>
 </body>
 </html>
