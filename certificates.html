@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>Сертифікати</title>
-  <link rel="icon" type="image/png" href="/favicon.png">
   <meta name="robots" content="noindex,nofollow">
+  <link rel="icon" type="image/png" href="/favicon.png">
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Fira+Code&display=swap');
     :root{--accent:#00ff88}
@@ -14,12 +14,10 @@
     .wrap{max-width:1200px;margin:0 auto;padding:20px}
     h1{margin:10px 0 6px}
     .muted{opacity:.75}
-    .btn{display:inline-block;background:rgba(0,255,136,.12);border:1px solid var(--accent);
-         color:var(--accent); padding:.5rem .9rem; border-radius:10px; text-decoration:none; cursor:pointer}
+    .btn{display:inline-block;background:rgba(0,255,136,.12);border:1px solid var(--accent);color:var(--accent);padding:.5rem .9rem;border-radius:10px;text-decoration:none;cursor:pointer}
     .btn:hover{background:rgba(0,255,136,.22)}
     .card{background:#141826;border:1px solid #1f2740;border-radius:14px;box-shadow:0 0 18px rgba(0,255,136,.08);padding:16px}
-    .pdf-card{background:#141826;border:1px solid #1f2740;border-radius:14px;
-              box-shadow:0 0 18px rgba(0,255,136,.08); padding:14px; margin:16px 0}
+    .pdf-card{background:#141826;border:1px solid #1f2740;border-radius:14px;box-shadow:0 0 18px rgba(0,255,136,.08);padding:14px;margin:16px 0}
     .pdf-head{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
     .pdf-title{font-weight:600}
     .pdf-meta{font-size:.85rem;opacity:.8}
@@ -38,33 +36,28 @@
       <a class="btn" href="index.html">← На головну</a>
     </div>
 
-    <!-- Парольная "дверца" -->
+    <!-- Пароль -->
     <div id="gate" class="card">
       <div class="row">
         <label class="muted">Пароль:</label>
-        <input id="pwd" type="password" placeholder="••••••••">
+        <input id="pwd" type="password" placeholder="••••">
         <button id="enterBtn" class="btn">Увійти</button>
       </div>
-      <p id="msg" class="muted" style="margin-top:8px;"></p>
+      <p id="msg" class="muted" style="margin-top:8px"></p>
     </div>
 
-    <!-- Контент под паролем -->
+    <!-- Контент -->
     <div id="content" style="display:none">
-      <p class="muted">Усі PDF підвантажуються з <code>/certs/</code> й показуються поспіль (lazy-load).</p>
+      <p class="muted">Усі PDF завантажуються з Google Drive за <code>fileId</code> з <code>/certs/manifest.json</code> і показуються поспіль (lazy-load).</p>
       <div id="list"></div>
       <p id="status" class="muted"></p>
     </div>
   </div>
 
 <script>
-// ======= НАСТРОЙКА ПАРОЛЯ =======
-// ЗАМЕНИ на свой SHA-256 хеш: сам хеш получить можно в консоли этой страницы:
-// (async s=>{const d=new TextEncoder().encode(s);
-// const h=await crypto.subtle.digest('SHA-256',d);
-// console.log([...new Uint8Array(h)].map(b=>b.toString(16).padStart(2,'0')).join(''));})('ТВОЙ_ПАРОЛЬ')
-const PASSWORD_SHA256_HEX = 'put_your_hash_here';
+// ======= Пароль: 2402 (SHA-256 проверки) =======
+const PASSWORD_SHA256_HEX = '4708f9c61a5e58b72774193f69bf37442423a4d2673e1f2cdc3f07f2614aba5d';
 
-// ======= ЛОГИКА ДВЕРЦЫ =======
 const gate = document.getElementById('gate');
 const content = document.getElementById('content');
 const msg = document.getElementById('msg');
@@ -74,7 +67,6 @@ const enterBtn = document.getElementById('enterBtn');
 enterBtn.onclick = async ()=>{
   const ok = (await sha256Hex(pwd.value||'')) === PASSWORD_SHA256_HEX;
   if(!ok){ msg.textContent = 'Невірний пароль.'; return; }
-  // показываем контент и только теперь грузим manifest + PDF
   gate.style.display='none';
   content.style.display='block';
   loadAll();
@@ -87,19 +79,18 @@ async function sha256Hex(text){
   return [...new Uint8Array(digest)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-// ======= ЗАГРУЗКА МАНИФЕСТА и РЕНДЕР PDF =======
+// ======= Рендер PDF из Drive =======
 async function loadAll(){
   const listEl = document.getElementById('list');
   const statusEl = document.getElementById('status');
 
-  // ленивый встраиватель iframe, чтобы не грузить все сразу на старте
   const io = new IntersectionObserver((entries)=>{
     entries.forEach(e=>{
       if(e.isIntersecting){
         const holder = e.target;
         if(holder.dataset.src && !holder.dataset.loaded){
           const ifr = document.createElement('iframe');
-          ifr.src = holder.dataset.src + '#toolbar=0&navpanes=0&scrollbar=0';
+          ifr.src = holder.dataset.src; // уже с /preview
           ifr.setAttribute('loading','lazy');
           holder.appendChild(ifr);
           holder.dataset.loaded = '1';
@@ -111,26 +102,24 @@ async function loadAll(){
   function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 
   function createCard(item){
+    const title = item.title || item.fileId;
+    const openUrl = `https://drive.google.com/file/d/${item.fileId}/view`;
+    const previewUrl = `https://drive.google.com/file/d/${item.fileId}/preview`;
+
     const card = document.createElement('div');
     card.className = 'pdf-card';
-    const title = item.title || item.file;
-    const meta = [];
-    if(item.file) meta.push(item.file);
-    if(item.updated) meta.push(`оновлено: ${item.updated}`);
-    if(item.sizeKB) meta.push(`${item.sizeKB} КБ`);
-
     card.innerHTML = `
       <div class="pdf-head">
         <div>
           <div class="pdf-title">${escapeHtml(title)}</div>
-          <div class="pdf-meta">${escapeHtml(meta.join(' • '))}</div>
+          <div class="pdf-meta">${item.updated?`оновлено: ${escapeHtml(item.updated)} • `:''}<span>Google Drive</span></div>
         </div>
         <div class="row">
-          <a class="btn" href="/certs/${encodeURIComponent(item.file)}" target="_blank" rel="noopener">Відкрити</a>
+          <a class="btn" href="${openUrl}" target="_blank" rel="noopener">Відкрити</a>
         </div>
       </div>
       <div class="pdf-embed">
-        <div class="holder" data-src="/certs/${encodeURIComponent(item.file)}"></div>
+        <div class="holder" data-src="${previewUrl}"></div>
       </div>`;
     const holder = card.querySelector('.holder');
     io.observe(holder);
@@ -142,7 +131,7 @@ async function loadAll(){
     const r = await fetch('/certs/manifest.json', {cache:'no-store'});
     if(!r.ok) throw new Error('manifest.json не знайдено');
     const manifest = await r.json();
-    const files = (manifest.files||[]).filter(f=>typeof f.file==='string');
+    const files = (manifest.files||[]).filter(f => typeof f.fileId==='string' && f.fileId.length>0);
     if(files.length===0){ statusEl.textContent='У маніфесті немає файлів.'; return; }
     statusEl.textContent = `Знайдено ${files.length} файл(и).`;
     files.forEach(it => listEl.appendChild(createCard(it)));
