@@ -1,7 +1,7 @@
 {
-  "updated": "2025-09-04",
+  "updated": "2025-09-05",
   "files": [
-    { "file": "Example1.pdf", "title": "Сертифікат №1 — Приклад", "updated": "2025-08-15", "sizeKB": 123 },
-    { "file": "Example2.pdf", "title": "Сертифікат №2 — Приклад", "updated": "2025-08-20", "sizeKB": 456 }
+    { "fileId": "1KwPju68-d_nbuW8FnU_tDGAt8g-a5AjF", "title": "Сертифікат №1", "updated": "2025-08-20" },
+    { "fileId": "9ZyXwVuTsRqPoNmLkJH", "title": "Сертифікат №2", "updated": "2025-08-25" }
   ]
 }
